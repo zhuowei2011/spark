@@ -58,7 +58,7 @@ from __future__ import print_function
 
 import sys
 
-from pyspark import SparkContext
+from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kinesis import KinesisUtils, InitialPositionInStream
 
@@ -68,8 +68,9 @@ if __name__ == "__main__":
             "Usage: kinesis_wordcount_asl.py <app-name> <stream-name> <endpoint-url> <region-name>",
             file=sys.stderr)
         sys.exit(-1)
-
-    sc = SparkContext(appName="PythonStreamingKinesisWordCountAsl")
+    conf = SparkConf().setAppName("PythonStreamingKinesisWordCountAsl")
+    conf.set('spark.serializer', 'org.apache.spark.serializer.KryoSerializer')
+    sc = SparkContext(conf=conf)
     ssc = StreamingContext(sc, 1)
     appName, streamName, endpointUrl, regionName = sys.argv[1:]
     lines = KinesisUtils.createStream(
